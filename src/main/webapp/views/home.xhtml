@@ -15,9 +15,11 @@
 	   			<h:outputStylesheet library = "css" name = "styles.css"  />
 	   			
    		<h:form >
+   		<p:growl id="growl" showDetail="true" widgetVar="growl" />
 	   		<h:panelGrid  columns="2" cellpadding="15" style="margin: 0 0 0 80%;">
 	   			<p:outputLabel  value="Welcom: #{User.login}!"  />
-	   			<p:commandButton  value="Logout" icon="pi pi-home" action="#{User.logout()}"/>
+	   			<p:commandButton  value="Logout" icon="pi pi-home" action="#{User.logout()}" />
+	   			
 	   		</h:panelGrid>
    		</h:form>
    		
@@ -26,7 +28,7 @@
 			     
 			    <h:panelGrid columns="7" cellpadding="15">
 			        <p:outputLabel value="List User:" for="acSimple" />
-			        <p:autoComplete id="acSimple" value="#{User.fio}" completeMethod="#{User.completeText}" />
+			        <p:autoComplete id="acSimple" value="#{User.fio}" completeMethod="#{User.completeFio}" />
 			        <p:outputLabel for="buttonFrom" value="from:" />
         			<p:calendar id="buttonFrom" value="#{calendarView.dateFrom}" showOn="button" navigator="true"/>
         			<p:outputLabel for="buttonTo" value="to:" />
@@ -55,16 +57,16 @@
 				        </f:facet>
 				        
 				        <p:ajax event="sort" skipChildren="false" />
-				        <p:column headerText="Id" sortBy="#{car.id}">
-				            <p:inputText value="#{car.id}" />
+				        <p:column headerText="Id" sortBy="#{Book.id}">
+				            <p:inputText value="#{Book.id}" />
 				        </p:column>
 				 
-				        <p:column headerText="Name Book" sortBy="#{car.brand}">
-				            <p:inputText value="#{car.brand}" />
+				        <p:column headerText="Name Book" sortBy="#{Book.title}">
+				            <p:inputText value="#{Book.title}" />
 				        </p:column>
 				 
-				        <p:column headerText="Date" sortBy="#{car.color}">
-				            <p:inputText value="#{car.color}" />
+				        <p:column headerText="Date" sortBy="#{Book.date}">
+				            <p:inputText value="#{Book.date}" />
 				        </p:column>
 			 
 			       

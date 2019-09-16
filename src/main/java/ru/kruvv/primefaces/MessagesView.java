@@ -8,7 +8,7 @@ import javax.faces.context.FacesContext;
 public class MessagesView {
 
 	public void info() {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "PrimeFaces Rocks."));
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", "You have left the application. For authorization, you must enter a username and password."));
 	}
 
 	public void warn() {
@@ -16,7 +16,7 @@ public class MessagesView {
 	}
 
 	public void error() {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Contact admin."));
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "Please enter your login and password"));
 	}
 
 	public void fatal() {
