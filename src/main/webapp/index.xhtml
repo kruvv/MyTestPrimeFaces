@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+	<h:head>
+	 	<title>Authorization</title>
+<!-- 	 	<h:outputStylesheet library="css" name="styles.css" /> -->
+	</h:head>
+	
+	<h:body>
+		<h:form>
+		 <h:panelGrid id="grid" columns="5" cellpadding="50" style="margin: 0 auto;">
+	            <p:panel header="Authorization">
+	            		                
+	                	<p:outputLabel for="inputText" value="Login: " />		 
+		                <p:inputText id="inputText" value="#{User.login}" placeholder="input test" style="margin: 0 0 0 10%;" required="true"/>
+	                    <br />
+	                    <p:message for="inputText" display="text" />
+	                    <br/>
+	           			<p:outputLabel for="password" value="Password: " />
+	        			<p:password id="password" value="#{User.password}" feedback="true" placeholder="input test" required="true"/>
+	       				<br />
+	       				<p:message for="password" display="text" />
+	                    <br/><br/>
+	                <p:commandButton value="Login" action="#{User.checkLogin()}" style="margin: 0 0 0 70%;" update="grid"/>
+	                      
+	 
+	            </p:panel>
+            </h:panelGrid>
+        </h:form>
+        
+	</h:body>
+</html>

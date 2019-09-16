@@ -1,0 +1,75 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
+
+	 <h:head>
+      <title>Find Page</title>
+       
+   </h:head>
+   
+   		<h:body>
+	   		
+	   			<h:outputStylesheet library = "css" name = "styles.css"  />
+	   			
+   		<h:form >
+	   		<h:panelGrid  columns="2" cellpadding="15" style="margin: 0 0 0 80%;">
+	   			<p:outputLabel  value="Welcom: #{User.login}!"  />
+	   			<p:commandButton  value="Logout" icon="pi pi-home" action="#{User.logout()}"/>
+	   		</h:panelGrid>
+   		</h:form>
+   		
+			<h:form>
+			    <p:growl id="msgs" showDetail="true" />
+			     
+			    <h:panelGrid columns="7" cellpadding="15">
+			        <p:outputLabel value="List User:" for="acSimple" />
+			        <p:autoComplete id="acSimple" value="#{User.fio}" completeMethod="#{User.completeText}" />
+			        <p:outputLabel for="buttonFrom" value="from:" />
+        			<p:calendar id="buttonFrom" value="#{calendarView.dateFrom}" showOn="button" navigator="true"/>
+        			<p:outputLabel for="buttonTo" value="to:" />
+        			<p:calendar id="buttonTo" value="#{calendarView.dateTo}" showOn="button" navigator="true" />
+			    	<p:commandButton value="Find" icon="pi pi-check" update="output msgs" oncomplete="PF('dlg').show()" />
+			    </h:panelGrid>
+		     
+		     
+		    	
+		    
+		    <p:dialog header="Values" resizable="false" showEffect="fade" widgetVar="dlg">
+	          <p:panelGrid id="output" columns="2" columnClasses="label, value">
+	            <h:outputText value="Simple:" />
+	            <h:outputText value="#{User.fio}" />
+	          </p:panelGrid>
+	         </p:dialog>
+			</h:form>
+			<hr />
+			<h:form>
+			    <p:dataTable var="car" value="#{dtPaginatorView.cars}" rows="10"
+			                 paginator="true"
+			                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			                 rowsPerPageTemplate="5,10,15">
+			        <f:facet name="header">
+				            Result Find
+				        </f:facet>
+				        
+				        <p:ajax event="sort" skipChildren="false" />
+				        <p:column headerText="Id" sortBy="#{car.id}">
+				            <p:inputText value="#{car.id}" />
+				        </p:column>
+				 
+				        <p:column headerText="Name Book" sortBy="#{car.brand}">
+				            <p:inputText value="#{car.brand}" />
+				        </p:column>
+				 
+				        <p:column headerText="Date" sortBy="#{car.color}">
+				            <p:inputText value="#{car.color}" />
+				        </p:column>
+			 
+			       
+			 
+			    </p:dataTable>
+			</h:form>
+		</h:body>
+</html>
