@@ -1,4 +1,4 @@
-package ru.kruvv.primefaces;
+package ru.kruvv.primefaces.views;
 
 import java.util.Date;
 

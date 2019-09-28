@@ -5,8 +5,17 @@
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:p="http://primefaces.org/ui">
 
+<f:view>
 	 <h:head>
       <title>Find Page</title>
+      <style type="text/css">
+    .ui-datatable input {
+        box-sizing: border-box;
+        width: 100%;
+        -webkit-box-shadow: none;
+        box-shadow: none !important;
+    }
+</style>
        
    </h:head>
    
@@ -15,63 +24,96 @@
 	   			<h:outputStylesheet library = "css" name = "styles.css"  />
 	   			
    		<h:form >
-   		<p:growl id="growl" showDetail="true" widgetVar="growl" />
-	   		<h:panelGrid  columns="2" cellpadding="15" style="margin: 0 0 0 80%;">
-	   			<p:outputLabel  value="Welcom: #{User.login}!"  />
-	   			<p:commandButton  value="Logout" icon="pi pi-home" action="#{User.logout()}" />
-	   			
-	   		</h:panelGrid>
+	   		<p:growl id="growl" showDetail="true" widgetVar="growl" />
+		   		<h:panelGrid  columns="2" cellpadding="15" style="margin: 0 0 0 80%;">
+		   			<p:outputLabel  value="Welcom: #{User.login}!"  />
+		   			<p:commandButton  value="Logout" icon="pi pi-home" action="#{userService.logout}" />
+		   			
+		   		</h:panelGrid>
    		</h:form>
    		
-			<h:form>
+			<h:form id="input">
 			    <p:growl id="msgs" showDetail="true" />
 			     
 			    <h:panelGrid columns="7" cellpadding="15">
-			        <p:outputLabel value="List User:" for="acSimple" />
-			        <p:autoComplete id="acSimple" value="#{User.fio}" completeMethod="#{User.completeFio}" />
+			        <p:outputLabel value="Search User:" for="acSimple" />
+			        <p:autoComplete  id="acSimple"  value="#{User}"  completeMethod="#{userService.completeFio}" minQueryLength="1" required="true" placeholder="Input Name user" />
 			        <p:outputLabel for="buttonFrom" value="from:" />
-        			<p:calendar id="buttonFrom" value="#{calendarView.dateFrom}" showOn="button" navigator="true"/>
+        			<p:calendar id="buttonFrom" value="#{calendarView.dateFrom}" showOn="button" navigator="true" />
         			<p:outputLabel for="buttonTo" value="to:" />
         			<p:calendar id="buttonTo" value="#{calendarView.dateTo}" showOn="button" navigator="true" />
-			    	<p:commandButton value="Find" icon="pi pi-check" update="output msgs" oncomplete="PF('dlg').show()" />
+			    	<p:commandButton   value="Find" icon="pi pi-check"   action="#{bookService.completeBooks(User)}" update=":input:data"  />
 			    </h:panelGrid>
 		     
 		     
 		    	
 		    
-		    <p:dialog header="Values" resizable="false" showEffect="fade" widgetVar="dlg">
+		    <!-- <p:dialog header="Values" resizable="false" showEffect="fade" widgetVar="dlg" >
 	          <p:panelGrid id="output" columns="2" columnClasses="label, value">
 	            <h:outputText value="Simple:" />
-	            <h:outputText value="#{User.fio}" />
+	            <h:outputText value="#{dtPaginatorView.books}" />
 	          </p:panelGrid>
-	         </p:dialog>
-			</h:form>
+	         </p:dialog> -->
+			<!-- </h:form> -->
+			
+			
 			<hr />
-			<h:form>
-			    <p:dataTable var="car" value="#{dtPaginatorView.cars}" rows="10"
+			
+			
+				
+			    	<p:dataTable id="data" var="book" value="#{bookService.returnBooks}" rows="10"
 			                 paginator="true"
 			                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-			                 rowsPerPageTemplate="5,10,15">
-			        <f:facet name="header">
-				            Result Find
-				        </f:facet>
+			                 rowsPerPageTemplate="5,10,15" autocomplete="on">
+			        
+			        <f:facet name="header">Result Find</f:facet>
 				        
 				        <p:ajax event="sort" skipChildren="false" />
-				        <p:column headerText="Id" sortBy="#{Book.id}">
-				            <p:inputText value="#{Book.id}" />
+				        
+				        <p:column headerText="Id" sortBy="#{book.id}">
+				            <h:outputText value="#{book.id}" />
 				        </p:column>
 				 
-				        <p:column headerText="Name Book" sortBy="#{Book.title}">
-				            <p:inputText value="#{Book.title}" />
+				        <p:column headerText="Name Book" sortBy="#{book.title}">
+				            <p:inputText value="#{book.title}" />
 				        </p:column>
 				 
-				        <p:column headerText="Date" sortBy="#{Book.date}">
-				            <p:inputText value="#{Book.date}" />
-				        </p:column>
-			 
-			       
+				        <p:column headerText="Date" sortBy="#{book.date}">
+				            <p:inputText value="#{book.date}" >
+				            	<f:convertDateTime pattern="dd-MM-yyyy" />
+				            </p:inputText>
+				        </p:column>			       
 			 
 			    </p:dataTable>
 			</h:form>
+			
+			<br />
+			<br />
+			
+			<!-- <p:ajaxStatus style="display:block;margin-bottom:2em;height:24px;">
+				    <f:facet name="default">
+				        <h:outputText value="Status: StandBy" />
+				    </f:facet>
+				     
+				    <f:facet name="start">
+				        <p:graphicImage name="/demo/images/ajaxloadingbar.gif" />
+				    </f:facet>
+				 
+				    <f:facet name="complete">
+				        <h:outputText value="Status: Completed" />
+				    </f:facet>
+				</p:ajaxStatus>
+				 
+				<p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
+				             
+				<p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
+				    <p:graphicImage name="/demo/images/ajaxloadingbar.gif" />
+				</p:dialog>
+				<h:form>
+				    <p:commandButton value="Send" icon="pi pi-refresh" />
+				</h:form> -->
+				
+				
 		</h:body>
+		</f:view>
 </html>
