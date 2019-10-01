@@ -32,17 +32,19 @@
 		   		</h:panelGrid>
    		</h:form>
    		
-			<h:form id="input">
+			<h:form id="input" style="padding: 2% 10%;">
 			    <p:growl id="msgs" showDetail="true" />
 			     
-			    <h:panelGrid columns="7" cellpadding="15">
+			    <h:panelGrid columns="9"  cellpadding="2" >
 			        <p:outputLabel value="Search User:" for="acSimple" />
-			        <p:autoComplete  id="acSimple"  value="#{User}"  completeMethod="#{userService.completeFio}" minQueryLength="1" required="true" placeholder="Input Name user" />
+			        <p:autoComplete  id="acSimple"  value="#{User}"  completeMethod="#{userService.findUser}" minQueryLength="1" required="true" placeholder="Input Name user" />
 			        <p:outputLabel for="buttonFrom" value="from:" />
-        			<p:calendar id="buttonFrom" value="#{calendarView.dateFrom}" showOn="button" navigator="true" />
+        			<p:calendar id="buttonFrom" value="#{calendar.dateFrom}" showOn="button" navigator="true" />
         			<p:outputLabel for="buttonTo" value="to:" />
-        			<p:calendar id="buttonTo" value="#{calendarView.dateTo}" showOn="button" navigator="true" />
-			    	<p:commandButton   value="Find" icon="pi pi-check"   action="#{bookService.completeBooks(User)}" update=":input:data"  />
+        			<p:calendar id="buttonTo" value="#{calendar.dateTo}" showOn="button" navigator="true" required="true" />
+			    	<br />
+			    	<p:message for="buttonTo" display="text" />
+			    	<p:commandButton   value="Find" icon="pi pi-check"   action="#{bookService.findAllBooks(User, calendar.dateFrom, calendar.dateTo)}" update=":input:data"  />
 			    </h:panelGrid>
 		     
 		     

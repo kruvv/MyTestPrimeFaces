@@ -1,6 +1,9 @@
 package ru.kruvv.primefaces.services;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.faces.bean.ApplicationScoped;
@@ -23,6 +26,9 @@ public class BookServiceImpl implements BookService {
 
 	private List<Book> returnBooks;
 
+//	@ManagedProperty(value = "calend")
+//	private CalendarView calendarView;
+
 	public List<Book> getReturnBooks() {
 		return returnBooks;
 	}
@@ -31,8 +37,16 @@ public class BookServiceImpl implements BookService {
 		this.returnBooks = returnBooks;
 	}
 
+//	public CalendarView getCalendarView() {
+//		return calendarView;
+//	}
+//
+//	public void setCalendarView(CalendarView calendarView) {
+//		this.calendarView = calendarView;
+//	}
+
 	@Override
-	public List<Book> getAllBooks(String fio) {
+	public List<Book> findAllBooks(String fio, Date from, Date to) {
 
 		returnBooks = new ArrayList<>();
 		Session session;
@@ -40,7 +54,16 @@ public class BookServiceImpl implements BookService {
 		try {
 			session = setUp().openSession();
 			session.beginTransaction();
-			List books = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=" + "'" + fio + "')").addEntity(Book.class).list();
+			List books;
+			if (from == null) {
+				books = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where " + "fio=" + "'" + fio + "'" + " and createDate<=" + "'" + formatDate(to) + "'" + ")").addEntity(Book.class).list();
+			} else {
+				books = session
+						.createSQLQuery(
+								"select p.* from books as p where user_id=(select c.user_id from users c where " + "fio=" + "'" + fio + "'" + " and createDate>=" + "'" + formatDate(from) + "'" + " and createDate<=" + "'" + formatDate(to) + "'" + ")")
+						.addEntity(Book.class).list();
+			}
+
 			if (books == null || books.isEmpty()) {
 				return null;
 			}
@@ -68,11 +91,9 @@ public class BookServiceImpl implements BookService {
 		return sessionFactory;
 	}
 
-	public List<Book> completeBooks(String fio) {
-//		BookServiceImpl service = new BookServiceImpl();
-		List<Book> booksUser = getAllBooks(fio);
-
-		return booksUser;
+	public String formatDate(Date date) {
+		Format formatter = new SimpleDateFormat("yyyy-MM-dd");
+		return formatter.format(date);
 	}
 
 }

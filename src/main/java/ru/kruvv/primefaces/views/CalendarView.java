@@ -2,9 +2,11 @@ package ru.kruvv.primefaces.views;
 
 import java.util.Date;
 
+import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 
-@ManagedBean
+@ManagedBean(name = "calendar")
+@ApplicationScoped
 public class CalendarView {
 
 	private Date dateFrom;

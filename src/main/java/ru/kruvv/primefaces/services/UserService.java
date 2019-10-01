@@ -8,4 +8,8 @@ public interface UserService {
 
 	public List<User> findUser(String filter);
 
+	public String logout();
+
+	public List<User> completeFio(String user_fio);
+
 }

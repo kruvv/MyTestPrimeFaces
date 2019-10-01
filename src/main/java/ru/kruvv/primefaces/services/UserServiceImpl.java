@@ -24,6 +24,14 @@ public class UserServiceImpl implements UserService {
 
 	private List<User> returnUsers;
 
+	public List<User> getReturnUsers() {
+		return returnUsers;
+	}
+
+	public void setReturnUsers(List<User> returnUsers) {
+		this.returnUsers = returnUsers;
+	}
+
 	@Override
 	public List<User> findUser(String filter) {
 
@@ -42,7 +50,7 @@ public class UserServiceImpl implements UserService {
 			} else {
 				for (User user : (List<User>) findUsers) {
 					if (user.toString().toLowerCase().contains(filter.toLowerCase())) {
-						logger.info("Recive FIO: " + user.getId() + ": " + user.getFio());
+						logger.info("Find User: " + user.getFio());
 						returnUsers.add(user);
 					}
 				}
@@ -66,15 +74,8 @@ public class UserServiceImpl implements UserService {
 		return sessionFactory;
 	}
 
-	public List<User> getReturnUsers() {
-		return returnUsers;
-	}
-
-	public void setReturnUsers(List<User> returnUsers) {
-		this.returnUsers = returnUsers;
-	}
-
 	// Method for exit from app
+	@Override
 	public String logout() {
 		// Reset Session
 		FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
@@ -83,6 +84,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	// Method search user
+	@Override
 	public List<User> completeFio(String user_fio) {
 		UserServiceImpl serviceImpl = new UserServiceImpl();
 
