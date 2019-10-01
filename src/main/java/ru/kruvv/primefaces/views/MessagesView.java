@@ -12,7 +12,7 @@ public class MessagesView {
 	}
 
 	public void warn() {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning!", "Watch out for PrimeFaces."));
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning!", "This field is required."));
 	}
 
 	public void error() {

@@ -8,6 +8,7 @@
 <f:view>
 	 <h:head>
       <title>Find Page</title>
+      
       <style type="text/css">
     .ui-datatable input {
         box-sizing: border-box;
@@ -15,6 +16,16 @@
         -webkit-box-shadow: none;
         box-shadow: none !important;
     }
+    /* body .ui-inputfield {
+    
+    width: 150px;
+    } */
+    
+    body .ui-button {
+    margin: 5px;
+    }
+    #pnl {margin-bottom:10px;}
+    #result #input {padding: 2% 10%;}
 </style>
        
    </h:head>
@@ -32,58 +43,68 @@
 		   		</h:panelGrid>
    		</h:form>
    		
-			<h:form id="input" style="padding: 2% 10%;">
-			    <p:growl id="msgs" showDetail="true" />
-			     
-			    <h:panelGrid columns="9"  cellpadding="2" >
-			        <p:outputLabel value="Search User:" for="acSimple" />
-			        <p:autoComplete  id="acSimple"  value="#{User}"  completeMethod="#{userService.findUser}" minQueryLength="1" required="true" placeholder="Input Name user" />
-			        <p:outputLabel for="buttonFrom" value="from:" />
-        			<p:calendar id="buttonFrom" value="#{calendar.dateFrom}" showOn="button" navigator="true" />
-        			<p:outputLabel for="buttonTo" value="to:" />
-        			<p:calendar id="buttonTo" value="#{calendar.dateTo}" showOn="button" navigator="true" required="true" />
-			    	<br />
-			    	<p:message for="buttonTo" display="text" />
-			    	<p:commandButton   value="Find" icon="pi pi-check"   action="#{bookService.findAllBooks(User, calendar.dateFrom, calendar.dateTo)}" update=":input:data"  />
-			    </h:panelGrid>
-		     
-		     
+			<h:form id="input" >
+			    <p:growl id="msg_input"  />
+			     <p:panel id="pnl" header="Search User" >
+        			<p:messages id="messages" />
+			    <h:panelGrid id="search"  columns="9" cellpadding="3" >
+			    	       <p:outputLabel  value="User:" for="findUser" />
+					       <p:autoComplete  id="findUser"  value="#{User}"  completeMethod="#{userService.findUser}" minQueryLength="1" required="true" placeholder="Input Name user" />
+					       
+			           
+					        <p:outputLabel  for="buttonFrom" value="start date:" />
+		        			<p:calendar  id="buttonFrom" value="#{calendar.dateFrom}" showOn="button" navigator="true" />
+	        		   
+		        			<p:outputLabel  for="buttonTo" value="end date:" />
+		        			<p:calendar  id="buttonTo" value="#{calendar.dateTo}" showOn="button" navigator="true" required="true" />
+					    	
+			    			
+			    			</h:panelGrid>
+				    		<p:commandButton id="findBtn"  value="Find" icon="pi pi-check"   action="#{bookService.findAllBooks(User, calendar.dateFrom, calendar.dateTo)}" update=":result:data, :input:search, :input:msg_input"  />
+				    	
+			    </p:panel>
+			    <p:blockUI block="pnl" trigger="findBtn" />
 		    	
 		    
-		    <!-- <p:dialog header="Values" resizable="false" showEffect="fade" widgetVar="dlg" >
-	          <p:panelGrid id="output" columns="2" columnClasses="label, value">
-	            <h:outputText value="Simple:" />
-	            <h:outputText value="#{dtPaginatorView.books}" />
-	          </p:panelGrid>
-	         </p:dialog> -->
-			<!-- </h:form> -->
-			
-			
-			<hr />
-			
-			
-				
+		   </h:form>
+			<br />				
+			<h:form id="result">
+				<p:growl id="msg_result" showDetail="true"/>	
 			    	<p:dataTable id="data" var="book" value="#{bookService.returnBooks}" rows="10"
 			                 paginator="true"
 			                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-			                 rowsPerPageTemplate="5,10,15" autocomplete="on">
+			                 rowsPerPageTemplate="5,10,15" autocomplete="on" lazy="true" editable="true" editMode="cell" >
 			        
 			        <f:facet name="header">Result Find</f:facet>
 				        
 				        <p:ajax event="sort" skipChildren="false" />
 				        
+					<p:ajax event="cellEdit" listener="#{bookService.onCellEdit}" update=":result:msg_result" />	     
+			  
 				        <p:column headerText="Id" sortBy="#{book.id}">
 				            <h:outputText value="#{book.id}" />
 				        </p:column>
 				 
 				        <p:column headerText="Name Book" sortBy="#{book.title}">
-				            <p:inputText value="#{book.title}" />
+				            <p:cellEditor>
+					            <f:facet name="output"><h:outputText value="#{book.title}" /></f:facet>
+	                   			<f:facet name="input"><p:inputText  value="#{book.title}" /></f:facet>
+				            </p:cellEditor> 
 				        </p:column>
 				 
 				        <p:column headerText="Date" sortBy="#{book.date}">
-				            <p:inputText value="#{book.date}" >
-				            	<f:convertDateTime pattern="dd-MM-yyyy" />
-				            </p:inputText>
+				            <p:cellEditor>
+				            	<f:facet name="output">
+					            	<h:outputText value="#{book.date}" >
+					            			<f:convertDateTime pattern="dd-MM-yyyy" />
+					            	</h:outputText>
+				            	</f:facet>
+					            <f:facet name="input">
+						            <p:inputText value="#{book.date}" >
+						            	<f:convertDateTime pattern="dd-MM-yyyy" />
+						            </p:inputText>
+					            </f:facet>
+					        </p:cellEditor>    
 				        </p:column>			       
 			 
 			    </p:dataTable>
