@@ -18,6 +18,9 @@
         <!-- Echo all executed SQL to stdout -->
  		<property name="show_sql">true</property>
  		
+ 		<!-- <property name="hbm2ddl.auto">validate</property> -->
+        <!-- <property name="hibernate.show_sql">true</property> -->
+ 		
  		<mapping class="ru.kruvv.primefaces.models.User" />
   		<mapping class="ru.kruvv.primefaces.models.Book" />
     </session-factory>

@@ -13,13 +13,12 @@ import javax.faces.context.FacesContext;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
 import org.primefaces.event.CellEditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.kruvv.primefaces.models.Book;
+import ru.kruvv.primefaces.util.HibernateUtil;
 
 @ManagedBean(name = "bookService")
 @ApplicationScoped
@@ -41,12 +40,12 @@ public class BookServiceImpl implements BookService {
 	public List<Book> findAllBooks(String fio, Date from, Date to) {
 
 		returnBooks = new ArrayList<>();
-		Session session;
-
+		Session session = null;
+		List<Book> books;
 		try {
-			session = setUp().openSession();
+			session = HibernateUtil.currentSession();
 			session.beginTransaction();
-			List books;
+
 			if (from == null) {
 				books = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where " + "fio=" + "'" + fio + "'" + " and createDate<=" + "'" + formatDate(to) + "'" + ")").addEntity(Book.class).list();
 			} else {
@@ -59,28 +58,25 @@ public class BookServiceImpl implements BookService {
 			if (books == null || books.isEmpty()) {
 				return null;
 			}
-			for (Book book : (List<Book>) books) {
-				if (book != null && book instanceof Book) {
-					logger.info(book.toString());
+			for (Book book : books) {
+				if (book != null) {
+//					logger.info(book.toString());
 					returnBooks.add(book);
 				}
 			}
 			session.getTransaction().commit();
-			session.close();
+
 		} catch (HibernateException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				HibernateUtil.closeSession();
+			}
 		}
 
 		return returnBooks;
-	}
-
-	protected SessionFactory setUp() throws Exception {
-		// A SessionFactory is set up once for an application
-		SessionFactory sessionFactory = new Configuration().configure("hibernate.cfg.xml") // configures settings from hibernate.cfg.xml
-				.buildSessionFactory();
-		return sessionFactory;
 	}
 
 	public String formatDate(Date date) {
@@ -89,22 +85,39 @@ public class BookServiceImpl implements BookService {
 	}
 
 	public void onCellEdit(CellEditEvent event) {
+
 		Object oldValue = event.getOldValue();
 		Object newValue = event.getNewValue();
 
 		logger.info(oldValue.toString());
-		logger.info(newValue.toString());
 
+		Session session = null;
+		int id = 0;
 		try {
-			Session session = setUp().openSession();
+			session = HibernateUtil.currentSession();
 			session.beginTransaction();
-			// String res = session.createQuery(queryString);
+			List<Book> lists = session.createSQLQuery("select p.* from books as p where p.titleBook='" + oldValue.toString() + "';").addEntity(Book.class).list();
+			for (Book book : lists) {
+				if (book != null) {
+					logger.info(book.toString());
+					id = book.getId();
+				}
+			}
+
+			Book updateBook = (Book) session.get(Book.class, id);
+
+			updateBook.setTitle(newValue.toString());
+
 			session.getTransaction().commit();
-			session.close();
+
 		} catch (HibernateException e) {
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				HibernateUtil.closeSession();
+			}
 		}
 
 		if (newValue != null && !newValue.equals(oldValue)) {
