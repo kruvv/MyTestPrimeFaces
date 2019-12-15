@@ -2,16 +2,17 @@ package ru.kruvv.primefaces.services;
 
 import java.text.Format;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.primefaces.event.CellEditEvent;
 import org.slf4j.Logger;
@@ -21,49 +22,53 @@ import ru.kruvv.primefaces.models.Book;
 import ru.kruvv.primefaces.util.HibernateUtil;
 
 @ManagedBean(name = "bookService")
-@ApplicationScoped
+//@ApplicationScoped
+//@ViewScoped
+@SessionScoped
 public class BookServiceImpl implements BookService {
 
 	private final static Logger logger = LoggerFactory.getLogger(BookServiceImpl.class);
 
-	private List<Book> returnBooks;
+	private List<Book> allBooks;
 
-	public List<Book> getReturnBooks() {
-		return returnBooks;
+	public List<Book> getallBooks() {
+		return allBooks;
 	}
 
-	public void setReturnBooks(List<Book> returnBooks) {
-		this.returnBooks = returnBooks;
+	public void setallBooks(List<Book> allBooks) {
+		this.allBooks = allBooks;
 	}
 
+	/**
+	 * This method searches for all books found by the user.
+	 */
 	@Override
 	public List<Book> findAllBooks(String fio, Date from, Date to) {
 
-		returnBooks = new ArrayList<>();
 		Session session = null;
-		List<Book> books;
+
 		try {
 			session = HibernateUtil.currentSession();
 			session.beginTransaction();
+			// allBooks = new ArrayList<>();
 
 			if (from == null) {
-				books = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where " + "fio=" + "'" + fio + "'" + " and createDate<=" + "'" + formatDate(to) + "'" + ")").addEntity(Book.class).list();
+				// если начальная дата не указанна, то выбераем все книги по обязательной
+				// конечной дате.
+
+				Query requestTo = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=:name and createDate<=:endDate)");
+				requestTo.setParameter("name", fio);
+				requestTo.setParameter("endDate", formatDate(to));
+				allBooks = ((SQLQuery) requestTo).addEntity(Book.class).list();
 			} else {
-				books = session
-						.createSQLQuery(
-								"select p.* from books as p where user_id=(select c.user_id from users c where " + "fio=" + "'" + fio + "'" + " and createDate>=" + "'" + formatDate(from) + "'" + " and createDate<=" + "'" + formatDate(to) + "'" + ")")
-						.addEntity(Book.class).list();
+				// иначе выбираем из указанного периода.
+				Query requestFromTo = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=:name and createDate>=:startDate and createDate<=:endDate)");
+				requestFromTo.setParameter("name", fio);
+				requestFromTo.setParameter("startDate", formatDate(from));
+				requestFromTo.setParameter("endDate", formatDate(to));
+				allBooks = ((SQLQuery) requestFromTo).addEntity(Book.class).list();
 			}
 
-			if (books == null || books.isEmpty()) {
-				return null;
-			}
-			for (Book book : books) {
-				if (book != null) {
-//					logger.info(book.toString());
-					returnBooks.add(book);
-				}
-			}
 			session.getTransaction().commit();
 
 		} catch (HibernateException e) {
@@ -76,14 +81,16 @@ public class BookServiceImpl implements BookService {
 			}
 		}
 
-		return returnBooks;
+		return allBooks;
 	}
 
+	// Форматируем дату.
 	public String formatDate(Date date) {
 		Format formatter = new SimpleDateFormat("yyyy-MM-dd");
 		return formatter.format(date);
 	}
 
+	// Метод обновляет дату
 	public void onCellEdit(CellEditEvent event) {
 
 		Object oldValue = event.getOldValue();
@@ -96,7 +103,11 @@ public class BookServiceImpl implements BookService {
 		try {
 			session = HibernateUtil.currentSession();
 			session.beginTransaction();
-			List<Book> lists = session.createSQLQuery("select p.* from books as p where p.titleBook='" + oldValue.toString() + "';").addEntity(Book.class).list();
+
+			Query query = session.createSQLQuery("select p.* from books as p where p.titleBook=:old");
+			query.setParameter("old", oldValue.toString());
+			List<Book> lists = ((SQLQuery) query).addEntity(Book.class).list();
+
 			for (Book book : lists) {
 				if (book != null) {
 					logger.info(book.toString());

@@ -37,7 +37,7 @@
    		<h:form >
 	   		<p:growl id="growl" showDetail="true" widgetVar="growl" />
 		   		<h:panelGrid  columns="2" cellpadding="15" style="margin: 0 0 0 80%;">
-		   			<p:outputLabel  value="Welcom: #{User.login}!"  />
+<!-- 		   			<p:outputLabel  value="Welcom: #{User.login}!"  /> -->
 		   			<p:commandButton  value="Logout" icon="pi pi-home" action="#{userService.logout}" />
 		   			
 		   		</h:panelGrid>
@@ -70,7 +70,7 @@
 			<br />				
 			<h:form id="result">
 				<p:growl id="msg_result" showDetail="true"/>	
-			    	<p:dataTable id="data" var="book" value="#{bookService.returnBooks}" rows="10"
+			    	<p:dataTable id="data" var="book" value="#{bookService.allBooks}" rows="5"
 			                 paginator="true"
 			                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 			                 rowsPerPageTemplate="5,10,15" autocomplete="on" lazy="true" editable="true" editMode="cell"  >
@@ -87,20 +87,20 @@
 				        </p:column>
 				 
 				        <p:column headerText="Name Book" sortBy="#{book.title}">
-				            <p:cellEditor>
-					            <f:facet name="output"><h:outputText value="#{book.title}" /></f:facet>
-	                   			<f:facet name="input"><p:inputText  value="#{book.title}" /></f:facet>
+				            <p:cellEditor sortBy="#{book.title}">
+					            <f:facet name="output" sortBy="#{book.title}"><h:outputText value="#{book.title}" /></f:facet>
+	                   			<f:facet name="input" sortBy="#{book.title}"><p:inputText  value="#{book.title}" /></f:facet>
 				            </p:cellEditor> 
 				        </p:column>
 				 
 				        <p:column headerText="Date" sortBy="#{book.date}">
-				            <p:cellEditor>
-				            	<f:facet name="output">
+				            <p:cellEditor sortBy="#{book.date}">
+				            	<f:facet name="output" sortBy="#{book.date}">
 					            	<h:outputText value="#{book.date}" >
 					            			<f:convertDateTime pattern="dd.MM.yyyy" />
 					            	</h:outputText>
 				            	</f:facet>
-					            <f:facet name="input">
+					            <f:facet name="input" sortBy="#{book.date}">
 						            <p:inputText value="#{book.date}" >
 						            	<f:convertDateTime pattern="dd.MM.yyyy" />
 						            </p:inputText>
@@ -109,33 +109,25 @@
 				        </p:column>			       
 			 
 			    </p:dataTable>
+			    
+	<!-- 		    <p:dataTable id="cars" var="car" value="#{dtColumnsView.cars}" widgetVar="carsTable" filteredValue="#{dtColumnsView.filteredCars}"
+			    value="#{bookService.allBooks}" rows="5"
+			                 paginator="true"
+			                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			                 rowsPerPageTemplate="5,10,15" autocomplete="on" lazy="true" editable="true" editMode="cell" >
+			                                     
+			        	<p:columns value="#{dtColumnsView.columns}" var="column" columnIndexVar="colIndex" sortBy="#{car[column.property]}" filterBy="#{car[column.property]}">
+				            <f:facet name="header">
+				                <h:outputText value="#{column.header}" />
+				            </f:facet>
+				            <h:outputText value="#{car[column.property]}" />
+				        </p:columns>
+			    	</p:dataTable> -->
 			</h:form>
 			
-			<br />
-			<br />
 			
-			<!-- <p:ajaxStatus style="display:block;margin-bottom:2em;height:24px;">
-				    <f:facet name="default">
-				        <h:outputText value="Status: StandBy" />
-				    </f:facet>
-				     
-				    <f:facet name="start">
-				        <p:graphicImage name="/demo/images/ajaxloadingbar.gif" />
-				    </f:facet>
-				 
-				    <f:facet name="complete">
-				        <h:outputText value="Status: Completed" />
-				    </f:facet>
-				</p:ajaxStatus>
-				 
-				<p:ajaxStatus onstart="PF('statusDialog').show()" onsuccess="PF('statusDialog').hide()" />
-				             
-				<p:dialog widgetVar="statusDialog" modal="true" draggable="false" closable="false" resizable="false" showHeader="false">
-				    <p:graphicImage name="/demo/images/ajaxloadingbar.gif" />
-				</p:dialog>
-				<h:form>
-				    <p:commandButton value="Send" icon="pi pi-refresh" />
-				</h:form> -->
+			
+			
 				
 				
 		</h:body>

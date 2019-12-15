@@ -10,6 +10,4 @@ public interface UserService {
 
 	public String logout();
 
-	public List<User> completeFio(String user_fio);
-
 }

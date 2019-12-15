@@ -2,6 +2,7 @@ package ru.kruvv.primefaces.services;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
@@ -21,16 +22,19 @@ public class UserServiceImpl implements UserService {
 
 	private final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
-	private List<User> returnUsers;
+	private List<User> findUsers;
 
-	public List<User> getReturnUsers() {
-		return returnUsers;
+	public List<User> getfindUsers() {
+		return findUsers;
 	}
 
-	public void setReturnUsers(List<User> returnUsers) {
-		this.returnUsers = returnUsers;
+	public void setfindUsers(List<User> findUsers) {
+		this.findUsers = findUsers;
 	}
 
+	/**
+	 * This method searches for the user in the search bar.
+	 */
 	@Override
 	public List<User> findUser(String filter) {
 
@@ -39,20 +43,13 @@ public class UserServiceImpl implements UserService {
 		try {
 			session = HibernateUtil.currentSession();
 			session.beginTransaction();
+			findUsers = new ArrayList<>();
+			List<User> users = session.createSQLQuery("select p.* from users as p").addEntity(User.class).list();
 
-			List<User> findUsers = session.createSQLQuery("select p.* from users as p").addEntity(User.class).list();
-
-			returnUsers = new ArrayList<>();
-
-			if (findUsers == null && findUsers.isEmpty()) {
+			if (users.isEmpty()) {
 				return null;
 			} else {
-				for (User user : findUsers) {
-					if (user.toString().toLowerCase().contains(filter.toLowerCase())) {
-//						logger.info("Find User: " + user.getFio());
-						returnUsers.add(user);
-					}
-				}
+				findUsers = users.stream().filter(s -> s.toString().toLowerCase().contains(filter.toLowerCase())).collect(Collectors.toList());
 			}
 
 			session.getTransaction().commit();
@@ -67,7 +64,7 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 
-		return returnUsers;
+		return findUsers;
 	}
 
 	// Method for exit from app
@@ -77,14 +74,6 @@ public class UserServiceImpl implements UserService {
 		FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
 
 		return "/index?faces-redirect=true";
-	}
-
-	// Method search user
-	@Override
-	public List<User> completeFio(String user_fio) {
-		UserServiceImpl serviceImpl = new UserServiceImpl();
-
-		return serviceImpl.findUser(user_fio);
 	}
 
 }
