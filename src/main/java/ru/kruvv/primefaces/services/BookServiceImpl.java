@@ -6,8 +6,8 @@ import java.util.Date;
 import java.util.List;
 
 import javax.faces.application.FacesMessage;
+import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
 import org.hibernate.HibernateException;
@@ -22,9 +22,9 @@ import ru.kruvv.primefaces.models.Book;
 import ru.kruvv.primefaces.util.HibernateUtil;
 
 @ManagedBean(name = "bookService")
-//@ApplicationScoped
+@ApplicationScoped
 //@ViewScoped
-@SessionScoped
+//@SessionScoped
 public class BookServiceImpl implements BookService {
 
 	private final static Logger logger = LoggerFactory.getLogger(BookServiceImpl.class);
@@ -50,7 +50,6 @@ public class BookServiceImpl implements BookService {
 		try {
 			session = HibernateUtil.currentSession();
 			session.beginTransaction();
-			// allBooks = new ArrayList<>();
 
 			if (from == null) {
 				// если начальная дата не указанна, то выбераем все книги по обязательной
@@ -84,51 +83,95 @@ public class BookServiceImpl implements BookService {
 		return allBooks;
 	}
 
-	// Форматируем дату.
+	/**
+	 * This method formats the date.
+	 * 
+	 * @param date
+	 * @return
+	 */
 	public String formatDate(Date date) {
 		Format formatter = new SimpleDateFormat("yyyy-MM-dd");
 		return formatter.format(date);
 	}
 
-	// Метод обновляет дату
+	/**
+	 * This method update title book and date.
+	 * 
+	 * @param event
+	 */
 	public void onCellEdit(CellEditEvent event) {
 
 		Object oldValue = event.getOldValue();
 		Object newValue = event.getNewValue();
-
-		logger.info(oldValue.toString());
-
 		Session session = null;
 		int id = 0;
-		try {
-			session = HibernateUtil.currentSession();
-			session.beginTransaction();
 
-			Query query = session.createSQLQuery("select p.* from books as p where p.titleBook=:old");
-			query.setParameter("old", oldValue.toString());
-			List<Book> lists = ((SQLQuery) query).addEntity(Book.class).list();
+		if (oldValue instanceof Date) {
 
-			for (Book book : lists) {
-				if (book != null) {
-					logger.info(book.toString());
-					id = book.getId();
+			logger.info("This is oldValue date: " + oldValue.toString());
+
+			try {
+				session = HibernateUtil.currentSession();
+				session.beginTransaction();
+
+				Query editDate = session.createSQLQuery("select p.* books as p where p.createDate=:old");
+				editDate.setParameter("old", oldValue);
+				List<Book> lists = ((SQLQuery) editDate).addEntity(Book.class).list();
+
+				for (Book book : lists) {
+					if (book != null) {
+						logger.info("This is old date book: " + book.toString());
+						id = book.getId();
+					}
+				}
+
+				Book updateBook = (Book) session.get(Book.class, id);
+
+				updateBook.setDate((Date) newValue);
+
+				session.getTransaction().commit();
+			} catch (HibernateException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (session != null) {
+					HibernateUtil.closeSession();
 				}
 			}
 
-			Book updateBook = (Book) session.get(Book.class, id);
+		} else {
+			try {
+				session = HibernateUtil.currentSession();
+				session.beginTransaction();
 
-			updateBook.setTitle(newValue.toString());
+				Query editTitle = session.createSQLQuery("select p.* from books as p where p.titleBook=:old");
+				editTitle.setParameter("old", oldValue.toString());
+				List<Book> lists = ((SQLQuery) editTitle).addEntity(Book.class).list();
 
-			session.getTransaction().commit();
+				for (Book book : lists) {
+					if (book != null) {
+						logger.info("This is old name book: " + book.toString());
+						id = book.getId();
+					}
+				}
 
-		} catch (HibernateException e) {
-			e.printStackTrace();
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			if (session != null) {
-				HibernateUtil.closeSession();
+				Book updateBook = (Book) session.get(Book.class, id);
+
+				updateBook.setTitle(newValue.toString());
+
+				session.getTransaction().commit();
+
+			} catch (HibernateException e) {
+				e.printStackTrace();
+			} catch (Exception e) {
+				e.printStackTrace();
+			} finally {
+				if (session != null) {
+					HibernateUtil.closeSession();
+				}
 			}
+
 		}
 
 		if (newValue != null && !newValue.equals(oldValue)) {

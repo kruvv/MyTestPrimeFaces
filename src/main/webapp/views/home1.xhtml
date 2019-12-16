@@ -7,7 +7,7 @@
 
 <f:view>
 	 <h:head>
-      <title>Find Page</title>
+      <title>Page Search</title>
       
       <style type="text/css">
     .ui-datatable input {
@@ -68,49 +68,52 @@
 		    
 		   </h:form>
 			<br />				
+			
+			    
+			    
+			    
 			<h:form id="result">
 				<p:growl id="msg_result" showDetail="true"/>	
 			    	<p:dataTable id="data" var="book" value="#{bookService.allBooks}" rows="5"
 			                 paginator="true"
 			                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-			                 rowsPerPageTemplate="5,10,15" autocomplete="on" lazy="true" editable="true" editMode="cell"  >
+			                 rowsPerPageTemplate="5,10,15" autocomplete="on" lazy="true"  >
 			        
 			        <f:facet name="header">Search results</f:facet>
 				        
-				        <p:ajax event="sort" skipChildren="false" />
-				        <p:ajax event="cellEdit" listener="#{bookService.onCellEdit}" update=":result:msg_result" />
-						     
+				       			     
 						  	     
 			  
 				        <p:column headerText="Id" sortBy="#{book.id}">
-				            <h:outputText value="#{book.id}" />
+				            <p:inputText value="#{book.id}" />
 				        </p:column>
 				 
 				        <p:column headerText="Name Book" sortBy="#{book.title}">
-				            <p:cellEditor >
-					            <f:facet name="output"><h:outputText value="#{book.title}" /></f:facet>
-	                   			<f:facet name="input"><p:inputText  value="#{book.title}" /></f:facet>
-				            </p:cellEditor> 
+				            					            
+	                   			<p:inputText  value="#{book.title}" />
+				            
 				        </p:column>
 				 
 				        <p:column headerText="Date" sortBy="#{book.date}">
-				            <p:cellEditor >
-				            	<f:facet name="output" >
-					            	<h:outputText value="#{book.date}" >
-					            			<f:convertDateTime pattern="dd.MM.yyyy" />
-					            	</h:outputText>
-				            	</f:facet>
-				             
-					            <f:facet name="input" >
+				               
+					            
 						            <p:inputText value="#{book.date}" >
 						            	<f:convertDateTime pattern="dd.MM.yyyy" />
 						            </p:inputText>
-					            </f:facet>
-					           </p:cellEditor>
+					            
+					           
 				        </p:column>			       
 			 
-			    </p:dataTable>				
-			  </h:form>	
-			</h:body>
+			    </p:dataTable>
+			    
+	
+			</h:form>
+			
+			
+			
+			
+				
+				
+		</h:body>
 		</f:view>
 </html>

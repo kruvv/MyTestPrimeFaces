@@ -101,7 +101,6 @@ public class User {
 
 			return "views/home?faces-redirect=true";
 		} else {
-
 			return "index?faces-redirect=true";
 		}
 	}
