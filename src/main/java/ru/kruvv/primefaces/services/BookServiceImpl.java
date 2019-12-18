@@ -6,12 +6,11 @@ import java.util.Date;
 import java.util.List;
 
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.primefaces.event.CellEditEvent;
@@ -20,16 +19,17 @@ import org.slf4j.LoggerFactory;
 
 import ru.kruvv.primefaces.models.Book;
 import ru.kruvv.primefaces.util.HibernateUtil;
+import ru.kruvv.primefaces.views.MessagesView;
 
 @ManagedBean(name = "bookService")
-@ApplicationScoped
+//@ApplicationScoped
 //@ViewScoped
-//@SessionScoped
+@SessionScoped
 public class BookServiceImpl implements BookService {
 
 	private final static Logger logger = LoggerFactory.getLogger(BookServiceImpl.class);
 
-	private List<Book> allBooks;
+	private List<Book> allBooks = null;
 
 	public List<Book> getallBooks() {
 		return allBooks;
@@ -55,17 +55,17 @@ public class BookServiceImpl implements BookService {
 				// если начальная дата не указанна, то выбераем все книги по обязательной
 				// конечной дате.
 
-				Query requestTo = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=:name and createDate<=:endDate)");
+				SQLQuery requestTo = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=:name and createDate<=:endDate)");
 				requestTo.setParameter("name", fio);
 				requestTo.setParameter("endDate", formatDate(to));
-				allBooks = ((SQLQuery) requestTo).addEntity(Book.class).list();
+				allBooks = requestTo.addEntity(Book.class).list();
 			} else {
 				// иначе выбираем из указанного периода.
-				Query requestFromTo = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=:name and createDate>=:startDate and createDate<=:endDate)");
+				SQLQuery requestFromTo = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=:name and createDate>=:startDate and createDate<=:endDate)");
 				requestFromTo.setParameter("name", fio);
 				requestFromTo.setParameter("startDate", formatDate(from));
 				requestFromTo.setParameter("endDate", formatDate(to));
-				allBooks = ((SQLQuery) requestFromTo).addEntity(Book.class).list();
+				allBooks = requestFromTo.addEntity(Book.class).list();
 			}
 
 			session.getTransaction().commit();
@@ -79,6 +79,10 @@ public class BookServiceImpl implements BookService {
 				HibernateUtil.closeSession();
 			}
 		}
+
+		System.out.println("====================================================");
+		allBooks.stream().forEach(System.out::println);
+		System.out.println("====================================================");
 
 		return allBooks;
 	}
@@ -103,27 +107,39 @@ public class BookServiceImpl implements BookService {
 
 		Object oldValue = event.getOldValue();
 		Object newValue = event.getNewValue();
-		Session session = null;
+
+		MessagesView messagesView = new MessagesView();
+
+		logger.info("This is old: " + oldValue.toString() + "\n");
+		logger.info("This is new: " + newValue.toString() + "\n");
+
+		System.out.println("====================================================");
+		allBooks.stream().forEach(System.out::println);
+		System.out.println("====================================================");
+
 		int id = 0;
+		for (Book book : allBooks) {
+			String book1 = book.getTitle();
+			if (book1.equals(oldValue.toString())) {
+				id = book.getId();
+				logger.info("id book: " + id);
+			}
+		}
+
+		List<Book> lists = null;
+		Session session = null;
 
 		if (oldValue instanceof Date) {
 
-			logger.info("This is oldValue date: " + oldValue.toString());
+			logger.info("This is oldValue date: " + oldValue.toString() + "\n");
 
 			try {
 				session = HibernateUtil.currentSession();
 				session.beginTransaction();
 
-				Query editDate = session.createSQLQuery("select p.* books as p where p.createDate=:old");
+				SQLQuery editDate = session.createSQLQuery("select p.* from books as p where p.createDate=:old");
 				editDate.setParameter("old", oldValue);
-				List<Book> lists = ((SQLQuery) editDate).addEntity(Book.class).list();
-
-				for (Book book : lists) {
-					if (book != null) {
-						logger.info("This is old date book: " + book.toString());
-						id = book.getId();
-					}
-				}
+				lists = editDate.addEntity(Book.class).list();
 
 				Book updateBook = (Book) session.get(Book.class, id);
 
@@ -145,16 +161,9 @@ public class BookServiceImpl implements BookService {
 				session = HibernateUtil.currentSession();
 				session.beginTransaction();
 
-				Query editTitle = session.createSQLQuery("select p.* from books as p where p.titleBook=:old");
+				SQLQuery editTitle = session.createSQLQuery("select p.* from books as p where p.titleBook=:old");
 				editTitle.setParameter("old", oldValue.toString());
-				List<Book> lists = ((SQLQuery) editTitle).addEntity(Book.class).list();
-
-				for (Book book : lists) {
-					if (book != null) {
-						logger.info("This is old name book: " + book.toString());
-						id = book.getId();
-					}
-				}
+				lists = editTitle.addEntity(Book.class).list();
 
 				Book updateBook = (Book) session.get(Book.class, id);
 
@@ -177,6 +186,8 @@ public class BookServiceImpl implements BookService {
 		if (newValue != null && !newValue.equals(oldValue)) {
 			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cell Changed", "Old: " + oldValue + ", New:" + newValue);
 			FacesContext.getCurrentInstance().addMessage(null, msg);
+		} else {
+			messagesView.warn();
 		}
 	}
 

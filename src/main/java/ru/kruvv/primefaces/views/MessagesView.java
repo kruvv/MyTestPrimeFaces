@@ -12,7 +12,7 @@ public class MessagesView {
 	}
 
 	public void warn() {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning!", "This field is required."));
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_WARN, "Warning!", "Invalid value. Please enter a valid value."));
 	}
 
 	public void error() {

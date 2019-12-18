@@ -35,11 +35,10 @@
 	   			<h:outputStylesheet library = "css" name = "styles.css"  />
 	   			
    		<h:form >
-	   		<p:growl id="growl" showDetail="true" widgetVar="growl" />
+	   			<p:growl id="growl" showDetail="true" widgetVar="growl" />
 		   		<h:panelGrid  columns="2" cellpadding="15" style="margin: 0 0 0 80%;">
 <!-- 		   			<p:outputLabel  value="Welcom: #{User.login}!"  /> -->
-		   			<p:commandButton  value="Logout" icon="pi pi-home" action="#{userService.logout}" />
-		   			
+		   			<p:commandButton  value="Logout" icon="pi pi-home" action="#{userService.logout}" />		   			
 		   		</h:panelGrid>
    		</h:form>
    		
@@ -47,23 +46,22 @@
 			    <p:growl id="msg_input"  />
 			     <p:panel id="pnl" header="Search User" >
         			<p:messages id="messages" />
-			    <h:panelGrid id="search"  columns="9" cellpadding="3" >
-			    	       <p:outputLabel  value="User:" for="findUser" />
-					       <p:autoComplete  id="findUser"  value="#{User}"  completeMethod="#{userService.findUser}" minQueryLength="1" required="true" placeholder="Input Name user" />
-					       
-			           
-					        <p:outputLabel  for="buttonFrom" value="Start date:" />
-		        			<p:calendar  id="buttonFrom" value="#{calendar.dateFrom}" showOn="button" navigator="true" />
-	        		   
-		        			<p:outputLabel  for="buttonTo" value="End date:" />
-		        			<p:calendar  id="buttonTo" value="#{calendar.dateTo}" showOn="button" navigator="true" required="true" />
-					    	
-			    			
-			    			</h:panelGrid>
-				    		<p:commandButton id="findBtn"  value="Find" icon="pi pi-check"   action="#{bookService.findAllBooks(User, calendar.dateFrom, calendar.dateTo)}" update=":result:data, :input:search, :input:msg_input"  />
-				    	
+				    <h:panelGrid id="search"  columns="9" cellpadding="3" >
+				    	       <p:outputLabel  value="User:" for="findUser" />
+						       <p:autoComplete  id="findUser"  value="#{User}"  completeMethod="#{userService.findUser}" minQueryLength="1" required="true" placeholder="Input Name user" />
+						       
+				           
+						        <p:outputLabel  for="buttonFrom" value="Start date:" />
+			        			<p:calendar  id="buttonFrom" value="#{calendar.dateFrom}" showOn="button" navigator="true" />
+		        		   
+			        			<p:outputLabel  for="buttonTo" value="End date:" />
+			        			<p:calendar  id="buttonTo" value="#{calendar.dateTo}" showOn="button" navigator="true" required="true" />
+						    	
+				    			<p:commandButton id="findBtn"  value="Find" icon="pi pi-check"   action="#{bookService.findAllBooks(User, calendar.dateFrom, calendar.dateTo)}" update=":result:data, :input:search, :input:msg_input"  />
+				    </h:panelGrid>				    				    	
 			    </p:panel>
-			    <p:blockUI block="pnl" trigger="findBtn" />
+			    
+		   <p:blockUI block="pnl" trigger="findBtn" />
 		    	
 		    
 		   </h:form>
@@ -99,16 +97,14 @@
 					            	<h:outputText value="#{book.date}" >
 					            			<f:convertDateTime pattern="dd.MM.yyyy" />
 					            	</h:outputText>
-				            	</f:facet>
-				             
+				            	</f:facet>				             
 					            <f:facet name="input" >
 						            <p:inputText value="#{book.date}" >
 						            	<f:convertDateTime pattern="dd.MM.yyyy" />
 						            </p:inputText>
 					            </f:facet>
-					           </p:cellEditor>
-				        </p:column>			       
-			 
+					        </p:cellEditor>
+				        </p:column>		 
 			    </p:dataTable>				
 			  </h:form>	
 			</h:body>
