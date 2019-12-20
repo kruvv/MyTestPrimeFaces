@@ -22,14 +22,13 @@ import ru.kruvv.primefaces.util.HibernateUtil;
 import ru.kruvv.primefaces.views.MessagesView;
 
 @ManagedBean(name = "bookService")
-//@ApplicationScoped
-//@ViewScoped
 @SessionScoped
 public class BookServiceImpl implements BookService {
 
 	private final static Logger logger = LoggerFactory.getLogger(BookServiceImpl.class);
 
 	private List<Book> allBooks = null;
+	MessagesView messagesView = new MessagesView();
 
 	public List<Book> getallBooks() {
 		return allBooks;
@@ -43,7 +42,7 @@ public class BookServiceImpl implements BookService {
 	 * This method searches for all books found by the user.
 	 */
 	@Override
-	public List<Book> findAllBooks(String fio, Date from, Date to) {
+	public List<Book> findAllBooks(String fio, Date start, Date end) {
 
 		Session session = null;
 
@@ -51,38 +50,35 @@ public class BookServiceImpl implements BookService {
 			session = HibernateUtil.currentSession();
 			session.beginTransaction();
 
-			if (from == null) {
-				// если начальная дата не указанна, то выбераем все книги по обязательной
-				// конечной дате.
-
+			if (start == null) {
+				// If the start date is not specified, then select all books by the mandatory
+				// end date.
 				SQLQuery requestTo = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=:name and createDate<=:endDate)");
 				requestTo.setParameter("name", fio);
-				requestTo.setParameter("endDate", formatDate(to));
+				requestTo.setParameter("endDate", formatDate(end));
 				allBooks = requestTo.addEntity(Book.class).list();
 			} else {
-				// иначе выбираем из указанного периода.
+				// Otherwise, select from the specified period.
 				SQLQuery requestFromTo = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=:name and createDate>=:startDate and createDate<=:endDate)");
 				requestFromTo.setParameter("name", fio);
-				requestFromTo.setParameter("startDate", formatDate(from));
-				requestFromTo.setParameter("endDate", formatDate(to));
+				requestFromTo.setParameter("startDate", formatDate(start));
+				requestFromTo.setParameter("endDate", formatDate(end));
 				allBooks = requestFromTo.addEntity(Book.class).list();
 			}
 
 			session.getTransaction().commit();
 
 		} catch (HibernateException e) {
+			messagesView.fatal();
 			e.printStackTrace();
 		} catch (Exception e) {
+			messagesView.fatalFindBooks("A serious error occurred while searching for books: " + e.getMessage());
 			e.printStackTrace();
 		} finally {
 			if (session != null) {
 				HibernateUtil.closeSession();
 			}
 		}
-
-		System.out.println("====================================================");
-		allBooks.stream().forEach(System.out::println);
-		System.out.println("====================================================");
 
 		return allBooks;
 	}
@@ -99,7 +95,7 @@ public class BookServiceImpl implements BookService {
 	}
 
 	/**
-	 * This method update title book and date.
+	 * This method edit title book and date.
 	 * 
 	 * @param event
 	 */
@@ -108,79 +104,13 @@ public class BookServiceImpl implements BookService {
 		Object oldValue = event.getOldValue();
 		Object newValue = event.getNewValue();
 
-		MessagesView messagesView = new MessagesView();
-
-		logger.info("This is old: " + oldValue.toString() + "\n");
-		logger.info("This is new: " + newValue.toString() + "\n");
-
-		System.out.println("====================================================");
-		allBooks.stream().forEach(System.out::println);
-		System.out.println("====================================================");
-
-		int id = 0;
-		for (Book book : allBooks) {
-			String book1 = book.getTitle();
-			if (book1.equals(oldValue.toString())) {
-				id = book.getId();
-				logger.info("id book: " + id);
-			}
-		}
-
 		List<Book> lists = null;
 		Session session = null;
 
 		if (oldValue instanceof Date) {
-
-			logger.info("This is oldValue date: " + oldValue.toString() + "\n");
-
-			try {
-				session = HibernateUtil.currentSession();
-				session.beginTransaction();
-
-				SQLQuery editDate = session.createSQLQuery("select p.* from books as p where p.createDate=:old");
-				editDate.setParameter("old", oldValue);
-				lists = editDate.addEntity(Book.class).list();
-
-				Book updateBook = (Book) session.get(Book.class, id);
-
-				updateBook.setDate((Date) newValue);
-
-				session.getTransaction().commit();
-			} catch (HibernateException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				if (session != null) {
-					HibernateUtil.closeSession();
-				}
-			}
-
+			updateDateBook(oldValue, newValue, session);
 		} else {
-			try {
-				session = HibernateUtil.currentSession();
-				session.beginTransaction();
-
-				SQLQuery editTitle = session.createSQLQuery("select p.* from books as p where p.titleBook=:old");
-				editTitle.setParameter("old", oldValue.toString());
-				lists = editTitle.addEntity(Book.class).list();
-
-				Book updateBook = (Book) session.get(Book.class, id);
-
-				updateBook.setTitle(newValue.toString());
-
-				session.getTransaction().commit();
-
-			} catch (HibernateException e) {
-				e.printStackTrace();
-			} catch (Exception e) {
-				e.printStackTrace();
-			} finally {
-				if (session != null) {
-					HibernateUtil.closeSession();
-				}
-			}
-
+			updateTitleBook(oldValue, newValue, session);
 		}
 
 		if (newValue != null && !newValue.equals(oldValue)) {
@@ -188,6 +118,95 @@ public class BookServiceImpl implements BookService {
 			FacesContext.getCurrentInstance().addMessage(null, msg);
 		} else {
 			messagesView.warn();
+		}
+	}
+
+	/**
+	 * This method update title book.
+	 * 
+	 * @param oldValue
+	 * @param newValue
+	 * @param session
+	 */
+	private void updateTitleBook(Object oldValue, Object newValue, Session session) {
+		List<Book> lists;
+		try {
+			session = HibernateUtil.currentSession();
+			session.beginTransaction();
+
+			int bookId = 0;
+			String bookValue = "";
+			for (Book book : allBooks) {
+				bookValue = book.getTitle();
+				if (bookValue.equals(newValue.toString())) {
+					bookId = book.getId();
+				}
+			}
+
+			SQLQuery updateTitle = session.createSQLQuery("select p.* from books as p where p.titleBook=:old");
+			updateTitle.setParameter("old", oldValue.toString());
+			lists = updateTitle.addEntity(Book.class).list();
+
+			Book updateBook = (Book) session.get(Book.class, bookId);
+
+			updateBook.setTitle(newValue.toString());
+
+			session.getTransaction().commit();
+
+		} catch (HibernateException e) {
+			messagesView.fatal();
+			e.printStackTrace();
+		} catch (Exception e) {
+			messagesView.fatalUpdate("Serious error occurred while updating title: " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				HibernateUtil.closeSession();
+			}
+		}
+	}
+
+	/**
+	 * This method update date book.
+	 * 
+	 * @param oldValue
+	 * @param newValue
+	 * @param session
+	 */
+	private void updateDateBook(Object oldValue, Object newValue, Session session) {
+		List<Book> lists;
+		try {
+			session = HibernateUtil.currentSession();
+			session.beginTransaction();
+
+			int bookId = 0;
+			String bookValue;
+			for (Book book : allBooks) {
+				bookValue = formatDate(book.getDate());
+				if (bookValue.equals(formatDate((Date) newValue))) {
+					bookId = book.getId();
+				}
+			}
+
+			SQLQuery updateDate = session.createSQLQuery("select p.* from books as p where p.createDate=:old");
+			updateDate.setParameter("old", oldValue);
+			lists = updateDate.addEntity(Book.class).list();
+
+			Book updateBook = (Book) session.get(Book.class, bookId);
+
+			updateBook.setDate((Date) newValue);
+
+			session.getTransaction().commit();
+		} catch (HibernateException e) {
+			messagesView.fatal();
+			e.printStackTrace();
+		} catch (Exception e) {
+			messagesView.fatalUpdate("Serious error occurred while updating date: " + e.getMessage());
+			e.printStackTrace();
+		} finally {
+			if (session != null) {
+				HibernateUtil.closeSession();
+			}
 		}
 	}
 

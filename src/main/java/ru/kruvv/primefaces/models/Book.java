@@ -3,8 +3,8 @@ package ru.kruvv.primefaces.models;
 import java.util.Date;
 import java.util.Objects;
 
-import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
+import javax.faces.bean.SessionScoped;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -14,17 +14,11 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @ManagedBean(name = "Book")
-//@SessionScoped
-@ApplicationScoped
+@SessionScoped
 @Entity
 @Table(name = "books")
 public class Book {
-
-	private final static Logger logger = LoggerFactory.getLogger(Book.class);
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

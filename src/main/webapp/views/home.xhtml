@@ -7,7 +7,7 @@
 
 <f:view>
 	 <h:head>
-      <title>Find Page</title>
+      <title>Page search books</title>
       
       <style type="text/css">
     .ui-datatable input {
@@ -16,10 +16,6 @@
         -webkit-box-shadow: none;
         box-shadow: none !important;
     }
-    /* body .ui-inputfield {
-    
-    width: 150px;
-    } */
     
     body .ui-button {
     margin: 5px;
@@ -36,8 +32,9 @@
 	   			
    		<h:form >
 	   			<p:growl id="growl" showDetail="true" widgetVar="growl" />
-		   		<h:panelGrid  columns="2" cellpadding="15" style="margin: 0 0 0 80%;">
-<!-- 		   			<p:outputLabel  value="Welcom: #{User.login}!"  /> -->
+		   		<h:panelGrid  columns="3" cellpadding="15" style="margin: 0 0 0 75%;">
+		   			<p:outputLabel  value="Welcom: "  />
+		   			<p:outputLabel  value="#{User.login}!"  />
 		   			<p:commandButton  value="Logout" icon="pi pi-home" action="#{userService.logout}" />		   			
 		   		</h:panelGrid>
    		</h:form>
@@ -48,7 +45,7 @@
         			<p:messages id="messages" />
 				    <h:panelGrid id="search"  columns="9" cellpadding="3" >
 				    	       <p:outputLabel  value="User:" for="findUser" />
-						       <p:autoComplete  id="findUser"  value="#{User}"  completeMethod="#{userService.findUser}" minQueryLength="1" required="true" placeholder="Input Name user" />
+						       <p:autoComplete  id="findUser"  value="#{User}"  completeMethod="#{userService.findUser}" minQueryLength="3" required="true" placeholder="Input Name user" />
 						       
 				           
 						        <p:outputLabel  for="buttonFrom" value="Start date:" />

@@ -7,7 +7,7 @@
 
 	<h:head>
 	 	<title>Authorization</title>
-<!-- 	 	<h:outputStylesheet library="css" name="styles.css" /> -->
+	 	<h:outputStylesheet library="css" name="styles.css" />
 	</h:head>
 	
 	<h:body>
@@ -17,20 +17,23 @@
 	            <p:panel header="Authorization">
 	            		                
 	                	<p:outputLabel for="inputText" value="Login: " />		 
-		                <p:inputText id="inputText" value="#{User.login}" placeholder="input test" style="margin: 0 0 0 10%;" required="false"/>
+		                <p:inputText id="inputText" value="#{User.login}" placeholder="input your login" style="margin: 0 0 0 10%;" required="true"/>
 	                    <br />
 	                    <p:message for="inputText" display="text" />
 	                    <br/>
 	           			<p:outputLabel for="password" value="Password: " />
-	        			<p:password id="password" value="#{User.password}" feedback="true" placeholder="input test" required="false"/>
+	        			<p:password id="password" value="#{User.password}" feedback="true" placeholder="input your password" required="true"/>
 	       				<br />
 	       				<p:message for="password" display="text" />
-	                    <br/><br/>
-	                <p:commandButton value="Login" action="#{User.checkLogin}" style="margin: 0 0 0 70%;" update="grid"/>
+	                    <br/>
+	                    <p:outputLabel>{login, password}</p:outputLabel><br />
+	                    <p:outputLabel>{tom1, 123}</p:outputLabel><br />
+				        <p:outputLabel>{tom2, 123}</p:outputLabel><br />
+				        <p:outputLabel>{tom3, 123}</p:outputLabel>
+	                <p:commandButton value="Login" action="#{userService.checkLogin(User.login, User.password)}" style="margin: 0 0 0 70%;" update="grid"/>
 	                 
 	            </p:panel>
             </h:panelGrid>
-        </h:form>
-        
+        </h:form>        
 	</h:body>
 </html>

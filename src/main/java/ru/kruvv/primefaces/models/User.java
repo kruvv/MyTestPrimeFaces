@@ -2,10 +2,8 @@ package ru.kruvv.primefaces.models;
 
 import java.util.Objects;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
-import javax.faces.context.FacesContext;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,18 +11,11 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
-import org.primefaces.event.SelectEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 @ManagedBean(name = "User")
 @SessionScoped
-//@ApplicationScoped
 @Entity
 @Table(name = "users")
 public class User {
-
-	private final static Logger logger = LoggerFactory.getLogger(User.class);
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -85,24 +76,6 @@ public class User {
 	@Override
 	public String toString() {
 		return fio;
-	}
-
-	public void onItemSelect(SelectEvent event) {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Item Selected", event.getObject().toString()));
-	}
-
-	/*
-	 * Метод простейшей авторизации. Выполняется проверка имени и пароля
-	 * пользователя. Результат проверки - наименование страницы перехода. В тестовом
-	 * режиме для входа поля логин и пароль оставить пустым
-	 */
-	public String checkLogin() {
-		if (login.equalsIgnoreCase("") && password.equalsIgnoreCase("")) {
-
-			return "views/home?faces-redirect=true";
-		} else {
-			return "index?faces-redirect=true";
-		}
 	}
 
 	@Override
