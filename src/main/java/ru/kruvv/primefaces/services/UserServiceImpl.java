@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
 import org.hibernate.HibernateException;
@@ -19,7 +19,7 @@ import ru.kruvv.primefaces.util.HibernateUtil;
 import ru.kruvv.primefaces.views.MessagesView;
 
 @ManagedBean(name = "userService", eager = true)
-@SessionScoped
+@ViewScoped
 public class UserServiceImpl implements UserService {
 
 	private final static Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -90,6 +90,8 @@ public class UserServiceImpl implements UserService {
 
 			session.getTransaction().commit();
 		} catch (HibernateException e) {
+			e.printStackTrace();
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			if (session != null) {

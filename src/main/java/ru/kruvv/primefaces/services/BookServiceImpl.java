@@ -104,15 +104,22 @@ public class BookServiceImpl implements BookService {
 		Object oldValue = event.getOldValue();
 		Object newValue = event.getNewValue();
 
-		List<Book> lists = null;
-		Session session = null;
-
 		if (oldValue instanceof Date) {
-			updateDateBook(oldValue, newValue, session);
+			updateDateBook(oldValue, newValue);
 		} else {
-			updateTitleBook(oldValue, newValue, session);
+			updateTitleBook(oldValue, newValue);
 		}
 
+		onCellEditMessages(oldValue, newValue);
+	}
+
+	/**
+	 * This method displays a message after editing data in a table.
+	 * 
+	 * @param oldValue
+	 * @param newValue
+	 */
+	public void onCellEditMessages(Object oldValue, Object newValue) {
 		if (newValue != null && !newValue.equals(oldValue)) {
 			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cell Changed", "Old: " + oldValue + ", New:" + newValue);
 			FacesContext.getCurrentInstance().addMessage(null, msg);
@@ -128,8 +135,9 @@ public class BookServiceImpl implements BookService {
 	 * @param newValue
 	 * @param session
 	 */
-	private void updateTitleBook(Object oldValue, Object newValue, Session session) {
-		List<Book> lists;
+	public void updateTitleBook(Object oldValue, Object newValue) {
+		List<Book> lists = null;
+		Session session = null;
 		try {
 			session = HibernateUtil.currentSession();
 			session.beginTransaction();
@@ -173,8 +181,9 @@ public class BookServiceImpl implements BookService {
 	 * @param newValue
 	 * @param session
 	 */
-	private void updateDateBook(Object oldValue, Object newValue, Session session) {
-		List<Book> lists;
+	public void updateDateBook(Object oldValue, Object newValue) {
+		List<Book> lists = null;
+		Session session = null;
 		try {
 			session = HibernateUtil.currentSession();
 			session.beginTransaction();
