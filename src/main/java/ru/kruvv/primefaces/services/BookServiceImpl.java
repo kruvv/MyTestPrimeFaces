@@ -10,9 +10,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.primefaces.event.CellEditEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -143,17 +145,13 @@ public class BookServiceImpl implements BookService {
 			session.beginTransaction();
 
 			int bookId = 0;
-			String bookValue = "";
+			String bookTitle = "";
 			for (Book book : allBooks) {
-				bookValue = book.getTitle();
-				if (bookValue.equals(newValue.toString())) {
+				bookTitle = book.getTitle();
+				if (bookTitle.equals(newValue.toString())) {
 					bookId = book.getId();
 				}
 			}
-
-			SQLQuery updateTitle = session.createSQLQuery("select p.* from books as p where p.titleBook=:old");
-			updateTitle.setParameter("old", oldValue.toString());
-			lists = updateTitle.addEntity(Book.class).list();
 
 			Book updateBook = (Book) session.get(Book.class, bookId);
 
@@ -189,17 +187,13 @@ public class BookServiceImpl implements BookService {
 			session.beginTransaction();
 
 			int bookId = 0;
-			String bookValue;
+			String bookDate;
 			for (Book book : allBooks) {
-				bookValue = formatDate(book.getDate());
-				if (bookValue.equals(formatDate((Date) newValue))) {
+				bookDate = formatDate(book.getDate());
+				if (bookDate.equals(formatDate((Date) newValue))) {
 					bookId = book.getId();
 				}
 			}
-
-			SQLQuery updateDate = session.createSQLQuery("select p.* from books as p where p.createDate=:old");
-			updateDate.setParameter("old", oldValue);
-			lists = updateDate.addEntity(Book.class).list();
 
 			Book updateBook = (Book) session.get(Book.class, bookId);
 

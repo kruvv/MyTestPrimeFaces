@@ -8,9 +8,11 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,7 +39,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/**
-	 * This method searches for the user in the search bar.
+	 * This method searches for all users in the search bar using autocomplete.
 	 */
 	@Override
 	public List<User> findUser(String filter) {
@@ -48,7 +50,9 @@ public class UserServiceImpl implements UserService {
 			session = HibernateUtil.currentSession();
 			session.beginTransaction();
 			findUsers = new ArrayList<>();
-			List<User> users = session.createSQLQuery("select p.* from users as p").addEntity(User.class).list();
+			
+			Criteria criteria = session.createCriteria(User.class);
+			List<User> users = criteria.list();
 
 			if (users.isEmpty()) {
 				return null;
@@ -75,6 +79,7 @@ public class UserServiceImpl implements UserService {
 	/*
 	 * This method simple authorization.
 	 */
+	@Override
 	public String checkLogin(String login, String password) {
 
 		Session session = null;
@@ -83,10 +88,10 @@ public class UserServiceImpl implements UserService {
 		try {
 			session = HibernateUtil.currentSession();
 			session.beginTransaction();
-
-			SQLQuery query = session.createSQLQuery("select u.* from users as u where login=:userLogin");
-			query.setParameter("userLogin", login);
-			users = query.addEntity(User.class).list();
+			
+			Criteria criteria = session.createCriteria(User.class);
+			criteria.add(Restrictions.eq("login", login));
+			users = criteria.list();
 
 			session.getTransaction().commit();
 		} catch (HibernateException e) {

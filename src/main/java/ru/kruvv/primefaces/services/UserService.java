@@ -10,4 +10,6 @@ public interface UserService {
 
 	public String logout();
 
+	public String checkLogin(String login, String password);
+
 }
