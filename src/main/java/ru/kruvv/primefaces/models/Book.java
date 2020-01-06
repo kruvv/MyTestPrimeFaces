@@ -2,14 +2,19 @@ package ru.kruvv.primefaces.models;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -31,7 +36,12 @@ public class Book {
 	@Temporal(TemporalType.DATE)
 	@Column(name = "createDate")
 	private Date date;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id")
+	private User user;
 
+		
 	public Book() {
 	}
 
@@ -63,6 +73,15 @@ public class Book {
 
 	public void setDate(Date date) {
 		this.date = date;
+	}
+
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 
 	@Override

@@ -1,6 +1,8 @@
 package ru.kruvv.primefaces.models;
 
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -9,6 +11,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @ManagedBean(name = "User")
@@ -30,9 +36,15 @@ public class User {
 
 	@Column(name = "password")
 	private String password;
+	
+	
+	@OneToMany(mappedBy = "user")
+	private List<Book> books;
 
 	public User() {
 	}
+
+	
 
 	public User(int id, String fio, String login, String password) {
 		this.id = id;
@@ -72,6 +84,16 @@ public class User {
 	public void setPassword(String password) {
 		this.password = password;
 	}
+
+	public List<Book> getBooks() {
+		return books;
+	}
+
+	public void setBooks(List<Book> books) {
+		this.books = books;
+	}
+
+
 
 	@Override
 	public String toString() {

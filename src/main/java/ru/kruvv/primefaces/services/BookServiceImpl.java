@@ -20,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.kruvv.primefaces.models.Book;
+import ru.kruvv.primefaces.models.User;
 import ru.kruvv.primefaces.util.HibernateUtil;
 import ru.kruvv.primefaces.views.MessagesView;
 
@@ -51,10 +52,25 @@ public class BookServiceImpl implements BookService {
 		try {
 			session = HibernateUtil.currentSession();
 			session.beginTransaction();
+			
 
 			if (start == null) {
 				// If the start date is not specified, then select all books by the mandatory
 				// end date.
+				
+//				Criteria criteria = session.createCriteria(Book.class);
+//				Criteria criteriaUser = session.createCriteria(User.class);
+//
+//				
+//				
+//				criteriaUser.add(Restrictions.eq("fio", fio));
+//				//criteria.add(Restrictions.ge("createDate", formatDate(end)));
+//				List<User> myUsers = criteriaUser.list();
+//				allBooks = criteria.list();
+//				
+//				myUsers.stream().forEach(System.out::println);
+//				allBooks.stream().forEach(System.out::println);
+				
 				SQLQuery requestTo = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=:name and createDate<=:endDate)");
 				requestTo.setParameter("name", fio);
 				requestTo.setParameter("endDate", formatDate(end));
