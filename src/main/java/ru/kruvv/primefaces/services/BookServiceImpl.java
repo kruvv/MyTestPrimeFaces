@@ -12,7 +12,6 @@ import javax.faces.context.FacesContext;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.primefaces.event.CellEditEvent;
@@ -20,7 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ru.kruvv.primefaces.models.Book;
-import ru.kruvv.primefaces.models.User;
 import ru.kruvv.primefaces.util.HibernateUtil;
 import ru.kruvv.primefaces.views.MessagesView;
 
@@ -53,41 +51,30 @@ public class BookServiceImpl implements BookService {
 			session = HibernateUtil.currentSession();
 			session.beginTransaction();
 			
-
 			if (start == null) {
 				// If the start date is not specified, then select all books by the mandatory
-				// end date.
+				// end date.				
+				Criteria criteria = session.createCriteria(Book.class, "book");
+				criteria.createCriteria("book.user", "u");
+				criteria.add(Restrictions.eq("u.fio", fio));		
+				criteria.add(Restrictions.le("book.date", end));
+				allBooks = criteria.list();
 				
-//				Criteria criteria = session.createCriteria(Book.class);
-//				Criteria criteriaUser = session.createCriteria(User.class);
-//
-//				
-//				
-//				criteriaUser.add(Restrictions.eq("fio", fio));
-//				//criteria.add(Restrictions.ge("createDate", formatDate(end)));
-//				List<User> myUsers = criteriaUser.list();
-//				allBooks = criteria.list();
-//				
-//				myUsers.stream().forEach(System.out::println);
-//				allBooks.stream().forEach(System.out::println);
-				
-				SQLQuery requestTo = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=:name and createDate<=:endDate)");
-				requestTo.setParameter("name", fio);
-				requestTo.setParameter("endDate", formatDate(end));
-				allBooks = requestTo.addEntity(Book.class).list();
 			} else {
-				// Otherwise, select from the specified period.
-				SQLQuery requestFromTo = session.createSQLQuery("select p.* from books as p where user_id=(select c.user_id from users c where fio=:name and createDate>=:startDate and createDate<=:endDate)");
-				requestFromTo.setParameter("name", fio);
-				requestFromTo.setParameter("startDate", formatDate(start));
-				requestFromTo.setParameter("endDate", formatDate(end));
-				allBooks = requestFromTo.addEntity(Book.class).list();
+				// Otherwise, select from the specified period.				
+				Criteria criteria = session.createCriteria(Book.class, "book");
+				criteria.createCriteria("book.user", "u");
+				criteria.add(Restrictions.eq("u.fio", fio));		
+				criteria.add(Restrictions.ge("book.date", start));
+				criteria.add(Restrictions.le("book.date", end));
+				allBooks = criteria.list();
+				
 			}
 
 			session.getTransaction().commit();
 
 		} catch (HibernateException e) {
-			messagesView.fatal();
+			messagesView.fatal(e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
 			messagesView.fatalFindBooks("A serious error occurred while searching for books: " + e.getMessage());
@@ -111,6 +98,7 @@ public class BookServiceImpl implements BookService {
 		Format formatter = new SimpleDateFormat("yyyy-MM-dd");
 		return formatter.format(date);
 	}
+	
 
 	/**
 	 * This method edit title book and date.
@@ -132,17 +120,18 @@ public class BookServiceImpl implements BookService {
 	}
 
 	/**
-	 * This method displays a message after editing data in a table.
+	 * This method displays a message after editing title or date in a table.
 	 * 
 	 * @param oldValue
 	 * @param newValue
 	 */
 	public void onCellEditMessages(Object oldValue, Object newValue) {
-		if (newValue != null && !newValue.equals(oldValue)) {
+		if (newValue != null && !newValue.equals(oldValue) && !(newValue instanceof Date))  {
 			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cell Changed", "Old: " + oldValue + ", New:" + newValue);
 			FacesContext.getCurrentInstance().addMessage(null, msg);
 		} else {
-			messagesView.warn();
+			FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Cell Changed", "Old: " + oldValue + ", New:" + formatDate((Date)newValue));
+			FacesContext.getCurrentInstance().addMessage(null, msg);
 		}
 	}
 
@@ -154,7 +143,6 @@ public class BookServiceImpl implements BookService {
 	 * @param session
 	 */
 	public void updateTitleBook(Object oldValue, Object newValue) {
-		List<Book> lists = null;
 		Session session = null;
 		try {
 			session = HibernateUtil.currentSession();
@@ -169,14 +157,13 @@ public class BookServiceImpl implements BookService {
 				}
 			}
 
-			Book updateBook = (Book) session.get(Book.class, bookId);
-
-			updateBook.setTitle(newValue.toString());
-
+			Book updateTitleBook = (Book) session.get(Book.class, bookId);
+			updateTitleBook.setTitle(newValue.toString());			
+			session.update(updateTitleBook);
 			session.getTransaction().commit();
 
 		} catch (HibernateException e) {
-			messagesView.fatal();
+			messagesView.fatal(e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
 			messagesView.fatalUpdate("Serious error occurred while updating title: " + e.getMessage());
@@ -196,7 +183,6 @@ public class BookServiceImpl implements BookService {
 	 * @param session
 	 */
 	public void updateDateBook(Object oldValue, Object newValue) {
-		List<Book> lists = null;
 		Session session = null;
 		try {
 			session = HibernateUtil.currentSession();
@@ -211,13 +197,13 @@ public class BookServiceImpl implements BookService {
 				}
 			}
 
-			Book updateBook = (Book) session.get(Book.class, bookId);
-
-			updateBook.setDate((Date) newValue);
-
+			Book updateDateBook = (Book) session.get(Book.class, bookId);
+			updateDateBook.setDate((Date) newValue);
+			session.update(updateDateBook);
 			session.getTransaction().commit();
+			
 		} catch (HibernateException e) {
-			messagesView.fatal();
+			messagesView.fatal(e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
 			messagesView.fatalUpdate("Serious error occurred while updating date: " + e.getMessage());

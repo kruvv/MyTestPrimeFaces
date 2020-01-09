@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService {
 			session.getTransaction().commit();
 
 		} catch (HibernateException e) {
-			messagesView.fatal();
+			messagesView.fatal(e.getMessage());
 			e.printStackTrace();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -105,14 +105,12 @@ public class UserServiceImpl implements UserService {
 		}
 
 		for (User user : users) {
-			if (login.equals(user.getLogin()) & password.equals(user.getPassword())) {
+			if (login.equals(user.getLogin()) && password.equals(user.getPassword())) {
 
 				return "views/home?faces-redirect=true";
-			} else {
-				return "index?faces-redirect=true";
-			}
+			} 
 		}
-		return "Sorry Опаньки!!!";
+		return "index?faces-redirect=true";
 
 	}
 

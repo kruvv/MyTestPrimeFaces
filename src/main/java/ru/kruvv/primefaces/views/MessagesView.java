@@ -19,8 +19,8 @@ public class MessagesView {
 		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR, "Error!", "This user is not registered, try again."));
 	}
 
-	public void fatal() {
-		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, "Fatal!", "System Error in Hibernate!!!"));
+	public void fatal(String msg) {
+		FacesContext.getCurrentInstance().addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, "Fatal!", "Error in Hibernate Query: " + msg ));
 	}
 
 	public void fatalUpdate(String messageUpdate) {

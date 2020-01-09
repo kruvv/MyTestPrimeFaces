@@ -49,10 +49,10 @@
 						       
 				           
 						        <p:outputLabel  for="buttonFrom" value="Start date:" />
-			        			<p:calendar  id="buttonFrom" value="#{calendar.dateFrom}" showOn="button" navigator="true" />
+			        			<p:calendar  id="buttonFrom" value="#{calendar.dateFrom}" showOn="button" navigator="true" pattern="dd.MM.yyyy" />
 		        		   
 			        			<p:outputLabel  for="buttonTo" value="End date:" />
-			        			<p:calendar  id="buttonTo" value="#{calendar.dateTo}" showOn="button" navigator="true" required="true" />
+			        			<p:calendar  id="buttonTo" value="#{calendar.dateTo}" showOn="button" navigator="true" required="true" pattern="dd.MM.yyyy" />
 						    	
 				    			<p:commandButton id="findBtn"  value="Find" icon="pi pi-check"   action="#{bookService.findAllBooks(User, calendar.dateFrom, calendar.dateTo)}" update=":result:data, :input:search, :input:msg_input"  />
 				    </h:panelGrid>				    				    	
