@@ -5,6 +5,13 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+
+/**
+ * This class create object session for connection by database
+ * 
+ * @author viktor
+ *
+ */
 public class HibernateUtil {
 
 	private static final SessionFactory sessionFactory;
@@ -20,6 +27,12 @@ public class HibernateUtil {
 
 	public static final ThreadLocal session = new ThreadLocal();
 
+	/**
+	 * This method uses the session factory interface to create a session.
+	 *  
+	 * @return The created session.
+	 * @throws HibernateException Indicates a problem opening the session; pretty rare here.
+	 */
 	public static Session currentSession() throws HibernateException {
 		Session s = (Session) session.get();
 		// Open a new Session, if this Thread has none yet
@@ -30,6 +43,11 @@ public class HibernateUtil {
 		return s;
 	}
 
+	/**
+	 * This method close session.
+	 * 
+	 * @throws HibernateException
+	 */
 	public static void closeSession() throws HibernateException {
 		Session s = (Session) session.get();
 		session.set(null);

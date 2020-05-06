@@ -2,7 +2,6 @@ package ru.kruvv.primefaces.models;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.SessionScoped;
@@ -11,12 +10,16 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+
+/**
+ * This is simple object User.
+ * 
+ * @author viktor
+ *
+ */
 @ManagedBean(name = "User")
 @SessionScoped
 @Entity

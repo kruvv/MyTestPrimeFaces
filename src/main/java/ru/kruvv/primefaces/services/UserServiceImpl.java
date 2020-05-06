@@ -10,7 +10,6 @@ import javax.faces.context.FacesContext;
 
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -20,6 +19,11 @@ import ru.kruvv.primefaces.models.User;
 import ru.kruvv.primefaces.util.HibernateUtil;
 import ru.kruvv.primefaces.views.MessagesView;
 
+/**
+ * This class implement {@link UserService}
+ * @author viktor
+ *
+ */
 @ManagedBean(name = "userService", eager = true)
 @ViewScoped
 public class UserServiceImpl implements UserService {
@@ -40,6 +44,10 @@ public class UserServiceImpl implements UserService {
 
 	/**
 	 * This method searches for all users in the search bar using autocomplete.
+	 * 
+	 * @param filter value for matching user
+	 * @exception HibernateException
+	 * @exception Exception
 	 */
 	@Override
 	public List<User> findUser(String filter) {
@@ -77,7 +85,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	/*
-	 * This method simple authorization.
+	 * The method receives a login and password and checks them in the database
+	 * 
+	 * @param login login user
+	 * @param password password user
+	 * @exception HibernateException
+	 * @exception Exception
 	 */
 	@Override
 	public String checkLogin(String login, String password) {

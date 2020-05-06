@@ -30,24 +30,16 @@ public class Main {
 		Date date = new Main().formaterDate("01.01.2012"); 
 		BookServiceImpl bookService = new BookServiceImpl();
 		Session session = HibernateUtil.currentSession();
-		List<Book> books = null;
-		
-		
+		List<Book> books = null;		
 		
 		try {
-			session.beginTransaction();
-			
-			
-			
+			session.beginTransaction();			
 			
 			Criteria criteria = session.createCriteria(Book.class, "book");
 			criteria.createCriteria("book.user", "u");
 			criteria.add(Restrictions.eq("u.fio", fio));		
 			criteria.add(Restrictions.le("book.date", date));
 			books = criteria.list();
-			
-			
-			
 			
 			session.getTransaction().commit();
 		} catch (Exception e) {
@@ -70,7 +62,6 @@ public class Main {
 		try {
 			parsingDate = siFormat.parse(date);
 		} catch (ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return parsingDate;

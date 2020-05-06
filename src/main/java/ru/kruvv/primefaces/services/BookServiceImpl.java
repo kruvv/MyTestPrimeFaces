@@ -22,6 +22,12 @@ import ru.kruvv.primefaces.models.Book;
 import ru.kruvv.primefaces.util.HibernateUtil;
 import ru.kruvv.primefaces.views.MessagesView;
 
+/**
+ * This class implements interface {@link BookService}
+ * @author viktor
+ *
+ */
+
 @ManagedBean(name = "bookService")
 @SessionScoped
 public class BookServiceImpl implements BookService {
@@ -41,6 +47,10 @@ public class BookServiceImpl implements BookService {
 
 	/**
 	 * This method searches for all books found by the user.
+	 * 
+	 * @param fio name user
+	 * @param start time start find
+	 * @param end time end find
 	 */
 	@Override
 	public List<Book> findAllBooks(String fio, Date start, Date end) {
@@ -91,8 +101,8 @@ public class BookServiceImpl implements BookService {
 	/**
 	 * This method formats the date.
 	 * 
-	 * @param date
-	 * @return
+	 * @param date Format input date "09.05.2020"
+	 * @return  Date after formating "2020-05-09"
 	 */
 	public String formatDate(Date date) {
 		Format formatter = new SimpleDateFormat("yyyy-MM-dd");
@@ -103,7 +113,7 @@ public class BookServiceImpl implements BookService {
 	/**
 	 * This method edit title book and date.
 	 * 
-	 * @param event
+	 * @param[CellEditEvent] event - data change action in the form
 	 */
 	public void onCellEdit(CellEditEvent event) {
 
@@ -140,7 +150,9 @@ public class BookServiceImpl implements BookService {
 	 * 
 	 * @param oldValue
 	 * @param newValue
-	 * @param session
+	 * @param session object for connections with db
+	 * @exception HibernateException  
+	 * @exception Exception 
 	 */
 	public void updateTitleBook(Object oldValue, Object newValue) {
 		Session session = null;
@@ -180,7 +192,9 @@ public class BookServiceImpl implements BookService {
 	 * 
 	 * @param oldValue
 	 * @param newValue
-	 * @param session
+	 * @param session object for connections with db
+	 * @exception HibernateException  
+	 * @exception Exception  
 	 */
 	public void updateDateBook(Object oldValue, Object newValue) {
 		Session session = null;

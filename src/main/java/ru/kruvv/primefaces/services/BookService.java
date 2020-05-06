@@ -5,6 +5,11 @@ import java.util.List;
 
 import ru.kruvv.primefaces.models.Book;
 
+/**
+ * This is interface for find books
+ * @author viktor
+ *
+ */
 public interface BookService {
 
 	public List<Book> findAllBooks(String fio, Date from, Date to);

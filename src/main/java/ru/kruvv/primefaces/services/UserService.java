@@ -4,6 +4,11 @@ import java.util.List;
 
 import ru.kruvv.primefaces.models.User;
 
+/**
+ * This is interface for find user
+ * @author viktor
+ *
+ */
 public interface UserService {
 
 	public List<User> findUser(String filter);
